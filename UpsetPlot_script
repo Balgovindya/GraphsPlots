@@ -1,0 +1,54 @@
+#set the directory where your input files are (alternatively you can give absolute path of your files)
+setwd('D:/PATH/to/folder')
+# Define file paths (replace these with actual paths to your CSV files, this is relative path as I have already defined directory)
+file_set1 <- "deseq2_results1h.csv"
+file_set2 <- "deseq2_results3h.csv"
+file_set3 <- "deseq2_results5h.csv"
+file_set4 <- "deseq2_results13h.csv"
+file_set5 <- "deseq2_results15h.csv"
+file_set6 <- "deseq2_results35h.csv"
+# Read the CSV files into data frames
+
+df_set1 <- read.csv(file_set1, header = TRUE)
+df_set2 <- read.csv(file_set2, header = TRUE)
+df_set3 <- read.csv(file_set3, header = TRUE)
+df_set4 <- read.csv(file_set4, header = TRUE)
+df_set5 <- read.csv(file_set5, header = TRUE)
+df_set6 <- read.csv(file_set6, header = TRUE)
+####my input files are in this format
+head(df_set1)
+       Gene_ID  baseMean log2FoldChange    lfcSE     stat       pvalue         padj
+1 Pp3c12_12070  61.64036       9.638032 1.293864 7.449031 9.400000e-14 3.810000e-12
+2  Pp3c24_4720  25.96643       8.389626 3.908760 2.146365           NA           NA
+3 Pp3c24_16569  22.54640       8.187023 1.308296 6.257774 3.910000e-10 7.950000e-09
+4  Pp3c2_24320 235.38584       7.861381 0.902373 8.711898 2.990000e-18 2.360000e-16
+5  Pp3c12_7837  31.49020       7.700934 1.320275 5.832827 5.450000e-09 8.790000e-08
+6   Pp3c15_500  14.76457       7.575359 3.910276 1.937295 5.270928e-02 1.155293e-01
+> 
+# filter the genes based on the criteria (I have selected based on adjusted p value and log fold change)
+filtered_genes1 <- df_set1[df_set1$padj < 0.05 & (df_set1$log2FoldChange > 1.5 | df_set1$log2FoldChange < -1.5), ]
+filtered_genes2 <- df_set2[df_set2$padj < 0.05 & (df_set2$log2FoldChange > 1.5 | df_set2$log2FoldChange < -1.5), ]
+filtered_genes3 <- df_set3[df_set3$padj < 0.05 & (df_set3$log2FoldChange > 1.5 | df_set3$log2FoldChange < -1.5), ]
+filtered_genes4 <- df_set4[df_set4$padj < 0.05 & (df_set4$log2FoldChange > 1.5 | df_set4$log2FoldChange < -1.5), ]
+filtered_genes5 <- df_set5[df_set5$padj < 0.05 & (df_set5$log2FoldChange > 1.5 | df_set5$log2FoldChange < -1.5), ]
+filtered_genes6 <- df_set6[df_set6$padj < 0.05 & (df_set6$log2FoldChange > 1.5 | df_set6$log2FoldChange < -1.5), ]
+# Extract the relevant column (assuming the column name is "Gene_ID")
+set1 <- filtered_genes1$Gene_ID
+set2 <- filtered_genes2$Gene_ID
+set3 <- filtered_genes3$Gene_ID
+set4 <- filtered_genes4$Gene_ID
+set5 <- filtered_genes5$Gene_ID
+set6 <- filtered_genes6$Gene_ID
+# Create a list of sets (instead of giving name as set alternatively you can give name corresponding to tour sample name)
+data_list <- list(Set1 = set1, Set2 = set2, Set3 = set3,Set4 = set4, Set5 = set5,Set6 = set6)
+library(UpSetR)
+
+
+# Convert the list to a binary matrix suitable for UpSetR
+upset_data <- fromList(data_list)
+# Plot the UpSet plot
+upset(upset_data, 
+      sets = c("Set1", "Set2", "Set3", "Set4", "Set5", "Set6"),
+      main.bar.color = "darkblue",
+      sets.bar.color = "purple", 
+      order.by = "freq")  # Order by frequency of intersections
